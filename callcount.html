@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>CALL COUNT</TITLE>
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20250321;22310895">
+	<META NAME="CHANGEDBY" CONTENT="Jacob Eiler">
+
+<STYLE TYPE="text/css">
+<!--
+body { font-family: "Helvetica" }
+
+.bold-button {
+    font-weight: bold;
+    font-size: 16px; 
+    padding: 10px;
+}
+
+.bold-input {
+    font-size: 16px; 
+    padding: 10px;
+    width: 4em;
+}
+        .overlay-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup-box {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            width: 540px;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .btn-close-popup {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-close-popup {
+            margin-top: 12px;
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        .btn-close-popup:hover {
+            background-color: #4caf50;
+        }
+
+        /* Keyframes for fadeInUp animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation for popup */
+        .overlay-container.show {
+            display: flex;
+            opacity: 1;
+        }
+-->
+</STYLE>
+
+<script>
+function countCallUp() {
+    var callCounter = document.getElementById('callCount');
+    var i = parseInt(callCounter.value, 10);
+    callCounter.value = ++i;
+}
+function countCallDown() {
+    var callCounter = document.getElementById('callCount');
+    var i = parseInt(callCounter.value, 10);
+    callCounter.value = --i;
+}
+function countXferUp() {
+    var xferCounter = document.getElementById('xferCount');
+    var i = parseInt(xferCounter.value, 10);
+    xferCounter.value = ++i;
+}
+function countXferDown() {
+    var xferCounter = document.getElementById('xferCount');
+    var i = parseInt(xferCounter.value, 10);
+    xferCounter.value = --i;
+}
+function displayDate() {
+    var now = new Date();
+
+    var day = ("0" + now.getDate()).slice(-2);
+    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+    document.getElementById("todayDate").value = today;
+}
+function clearForm() {
+    document.getElementById("callCount").value = "0";	
+    document.getElementById("xferCount").value = "0";	
+    document.getElementById("workHours").value = "0";	
+    document.getElementById("workPause").value = "0";	
+}
+function editDate() {
+    document.getElementById("todayDate").readOnly = false;	
+}
+function togglePopup() {
+            const overlay = document.getElementById('popupOverlay');
+            overlay.classList.toggle('show');
+}
+</script>
+<script>
+    let saveFile = () => {
+    	
+        // Get the data from each element on the form.
+    	const workdate = document.getElementById('todayDate');
+        const callscount = document.getElementById('callCount');
+        const xfercount = document.getElementById('xferCount');
+        const hours = document.getElementById('workHours');
+        const paused = document.getElementById('workPause');
+        
+        // This variable stores all the data.
+let data = `${workdate.value},${callscount.value},${xfercount.value},${hours.value},${paused.value}
+`;        
+
+        // Convert the text to BLOB.
+        const textToBLOB = new Blob([data], { type: 'text/plain' });
+        const sFileName = workdate.value + '_calls.csv';	   // The file to save the data.
+
+        let newLink = document.createElement("a");
+        newLink.download = sFileName;
+
+        if (window.webkitURL != null) {
+            newLink.href = window.webkitURL.createObjectURL(textToBLOB);
+        }
+        else {
+            newLink.href = window.URL.createObjectURL(textToBLOB);
+            newLink.style.display = "none";
+            document.body.appendChild(newLink);
+        }
+
+        newLink.click(); 
+    }
+</script>
+</head>
+<body onload="displayDate()">
+<font color="blue"><h2>ACS Call Count</h2></font>
+<hr />
+<font color="blue">Log your calls and transfer tally, with hours and pause.</font> | <a href="javascript:togglePopup()">Quick Help</a>
+<hr size="1" noshade="noshade">
+<b>Date:</b> <input type="date" id="todayDate" value="" readonly> &nbsp;&nbsp; <font color="blue" size="-1"><a href="javascript:editDate()">change</a></font><br />
+<h4>Calls</h4>
+<input class="bold-input" type="text" id="callCount" value="0">
+<button class="bold-button" onclick="countCallUp()">+</button>
+<button onclick="countCallDown()">-</button>
+<h4>Transfers</h4>
+<input class="bold-input" type="text" id="xferCount" value="0">
+<button class="bold-button" onclick="countXferUp()">+</button>
+<button onclick="countXferDown()">-</button>
+<br />
+<h4>Hours Worked</h4>
+<input type="text" id="workHours" value="0" style="width: 4em"> <font size="-1" color="gray"><b>Hours</b> (unpaused) </font><br /><br />
+<input type="text" id="workPause" value="0" style="width: 4em"> <font size="-1" color="gray"><b>Paused</b> (mins) </font><br />
+<br />
+<br />
+<input type="button" id="bt" class="bold-button" value="Save Daily Stats" onclick="saveFile()" /> &nbsp; (saves to Downloads - see <a href="callcounthelp.html" target="_blank">Help</a>)
+<br /><br />
+<input type="button" id="rs" value="Reset Form" onclick="clearForm()" />
+<br /><br />
+<b>Review Stats: </b><a href="https://certificationcenter.talentlms.com/learner/courseinfo/id:191" target="_blank">ACS RBO Review</a>
+<br />
+<br />
+<hr size="1" noshade="noshade">
+<font size="-1" color="gray">Tool created by Jacob Eiler.  <a href="mailto:jacob@jinet.us?subject=ACS Tool Feedback">Click to submit feedback</a></font>
+<br />
+<!-- BEGIN HELP POPUP CONTENT -->
+    <div id="popupOverlay" 
+         class="overlay-container">
+        <div class="popup-box">
+            <h2 style="color: blue;">Help & Instructions</h2>
+<font size="-1"><b>Basic Usage</b><br />
+<b>Date</b> loads today's date and will become the first part of the save file.  <b>Add Calls or Transfers</b> by clicking the big + button next to each.  Or, remove a call or transfer using the - button.  <b>Hours worked and Pause</b> time are manually entered.<br /><br />
+<b>To save the log</b>, click Save Daily Stats.  This will immediately download a file into your Downloads folder.  You will need to move this file into it's own folder where you'll save all the daily logs.  I recommend using the batch program (move_logs.bat) from your Downloads folder, which moves logs into the "ACS Logs" folder under your Downloads folder.  <a href="callcounthelp.html" target="_blank">See Help</a><br /><br />
+<b>Moving Logs</b><br />
+To move all the logs into the same folder for saving and later import to the spreadsheet, simply copy the move_logs.bat file into your Downloads folder.  Then, anytime you have downloaded logs, just run the move_logs.bat file and it will create the 'ACS Logs' folder and move all the logs there automatically.  <a href="callcounthelp.html" target="_blank">See Help</a><br /><br />
+<b>Importing Logs to Spreadsheet</b><br />
+The final part of this tool is the ability to import all the logs into a spreadsheet for tracking, calculation, and more!  The spreadsheet  Excel-Merge-Logs.xlsm imports the logs from their csv format into a spreadsheet for a complete and centralized location to track your work.  Using the spreadsheet, you can merge downloaded logs automatically and use Excel to calculate total hours, calls, and transfers.<br /><br />
+<b>For More Help</b>, and details on merging using Excel, <a href="callcounthelp.html" target="_blank">click here</a>.<br /></font>
+            <button class="btn-close-popup" 
+                    onclick="togglePopup()">
+              Close
+              </button>
+        </div>
+    </div>
+
+<!-- END HELP POPUP CONTENT -->
+</body>
+</html>
